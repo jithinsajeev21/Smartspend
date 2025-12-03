@@ -8,7 +8,7 @@ import { BillDetailModal, ItemDetailModal } from './components/DetailModals';
 import { analyzeExpenses } from './services/geminiService';
 import { PieChartIcon, ListIcon, ShoppingCartIcon } from 'lucide-react';
 
-const STORAGE_KEY = 'smartSpend_expenses_v5'; // Updated version to reset data
+const STORAGE_KEY = 'smartSpend_expenses_v6'; // Updated version to reset data
 
 // Demo data generator for comprehensive grocery context with Stores and Splitting
 const generateDummyData = (): Expense[] => [
@@ -91,6 +91,12 @@ const App: React.FC = () => {
         }
         return e;
     }));
+    
+    // Crucial: If the date was changed, update the selectedBill state so the modal stays valid
+    if (updates.date && selectedBill && selectedBill.store === store && selectedBill.date === date) {
+        setSelectedBill({ store, date: updates.date });
+    }
+
     if (analysis) setAnalysis(null);
   };
 

@@ -20,10 +20,14 @@ interface ItemDetailModalProps {
 
 export const BillDetailModal: React.FC<BillDetailModalProps> = ({ billIdentifier, expenses, onClose, onUpdateBill, onUpdateExpense, people }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [editDate, setEditDate] = useState('');
 
-  // Reset editing state when bill changes
+  // Reset editing state and sync date when bill changes
   useEffect(() => {
     setIsEditing(false);
+    if (billIdentifier) {
+        setEditDate(billIdentifier.date);
+    }
   }, [billIdentifier]);
 
   if (!billIdentifier) return null;
@@ -33,7 +37,6 @@ export const BillDetailModal: React.FC<BillDetailModalProps> = ({ billIdentifier
   );
 
   const total = billItems.reduce((sum, e) => sum + e.amount, 0);
-  // Calculate distinct payers and owners to guess current status
   const payers = Array.from(new Set(billItems.map(e => e.payer)));
   const owners = Array.from(new Set(billItems.map(e => e.owner)));
   
@@ -45,6 +48,15 @@ export const BillDetailModal: React.FC<BillDetailModalProps> = ({ billIdentifier
 
   const handleSetShared = () => {
     onUpdateBill(billIdentifier.store, billIdentifier.date, { owner: 'Shared' });
+  };
+
+  // If date is changed in the input, apply it immediately to all items in bill
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newDate = e.target.value;
+    setEditDate(newDate);
+    if (newDate) {
+        onUpdateBill(billIdentifier.store, billIdentifier.date, { date: newDate });
+    }
   };
 
   return (
@@ -60,7 +72,16 @@ export const BillDetailModal: React.FC<BillDetailModalProps> = ({ billIdentifier
             <h2 className="text-2xl font-bold">{billIdentifier.store}</h2>
             <div className="flex items-center gap-2 mt-2 opacity-90 text-sm">
                 <CalendarIcon size={16} />
-                {new Date(billIdentifier.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                {isEditing ? (
+                    <input 
+                        type="date"
+                        value={editDate}
+                        onChange={handleDateChange}
+                        className="bg-white/20 border border-white/30 rounded px-2 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/50"
+                    />
+                ) : (
+                    <span>{new Date(billIdentifier.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                )}
             </div>
           </div>
           <div className="flex gap-2">
@@ -172,16 +193,20 @@ export const BillDetailModal: React.FC<BillDetailModalProps> = ({ billIdentifier
 export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, onClose, onUpdateExpense, people }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
+  const [editDate, setEditDate] = useState('');
   
   useEffect(() => {
-    if (item) setEditName(item.description);
+    if (item) {
+        setEditName(item.description);
+        setEditDate(item.date);
+    }
     setIsEditing(false);
   }, [item]);
 
   if (!item) return null;
 
   const handleSave = () => {
-    onUpdateExpense(item.id, { description: editName });
+    onUpdateExpense(item.id, { description: editName, date: editDate });
     setIsEditing(false);
   };
 
@@ -246,7 +271,16 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, onClose,
                         <CalendarIcon size={18} />
                         <span className="text-sm font-medium">Date</span>
                     </div>
-                    <span className="text-sm font-semibold text-gray-900">{new Date(item.date).toLocaleDateString()}</span>
+                    {isEditing ? (
+                        <input 
+                            type="date"
+                            value={editDate}
+                            onChange={(e) => setEditDate(e.target.value)}
+                            className="bg-white border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:border-indigo-500"
+                        />
+                    ) : (
+                        <span className="text-sm font-semibold text-gray-900">{new Date(item.date).toLocaleDateString()}</span>
+                    )}
                 </div>
 
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">

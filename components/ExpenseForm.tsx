@@ -438,7 +438,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ onAddExpenses, people,
                                 <span className="text-xs text-gray-300">|</span>
                                 <input 
                                     type="date"
-                                    className={`bg-transparent text-[10px] border-b border-transparent focus:border-indigo-300 outline-none ${isOld ? 'text-orange-600 font-bold' : 'text-gray-400'}`}
+                                    className={`bg-transparent text-xs border-b border-transparent focus:border-indigo-300 outline-none ${isOld ? 'text-orange-600 font-bold bg-white/50 px-1 rounded' : 'text-gray-500'}`}
                                     value={item.date}
                                     onChange={e => updateItem(item.tempId, { date: e.target.value })}
                                 />
