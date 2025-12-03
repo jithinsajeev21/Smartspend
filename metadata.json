@@ -1,0 +1,7 @@
+{
+  "name": "SmartSpend",
+  "description": "An intelligent expense tracker that visualizes your spending habits and provides AI-powered financial insights using Gemini.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
